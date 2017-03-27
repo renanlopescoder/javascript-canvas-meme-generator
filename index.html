@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MemeGenerator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="author" content="Renan Lopes">
+  <meta name="description" content="Front End Web Developer">
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css?family=Audiowide" rel="stylesheet">
+  <script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.6/css/uikit.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.6/js/uikit.min.js"></script>
+  <style>
+    #image-container {
+      display: flex;
+    }
+    html{
+      background-color:black;
+      overflow-x: hidden;
+    }
+    .yellow-text {
+      color:#ffd700;
+      font-family: 'Audiowide', cursive;
+      font-weight: bolder;
+    }
+  </style>
+</head>
+
+<body>
+<div class="uk-container uk-background-contain" uk-grid id="image-container" uk-height-viewport>
+<img class="hack-main-background" src="https://www.walldevil.com/wallpapers/w02/792796-black-background-star-wars-stormtroopers.jpg" alt="background" uk-cover>
+  <div class="uk-overlay uk-overlay-primary uk-position-top">
+    <h1 class="uk-heading-line uk-text-center">
+      <span class="yellow-text">Meme Generator</span>
+    </h1>
+    <div>
+      <div class="uk-light uk-padding">
+        <h3 class="meme-font"></h3>
+        <p class="meme-font-text">Gerador de memes de código aberto desenvolvido no curso <a href="https://br.udacity.com/course/front-end-web-developer-nanodegree--nd001/">Udacity Front End Developer</a></p>
+          <div class="uk-margin">
+              <div uk-form-custom>
+                  <input type="file" id="file">
+                  <button class="uk-button uk-button-default" type="button" tabindex="-1">Selecione a Foto</button>
+              </div>
+          </div>
+          <div class="uk-margin">
+              <!--<label class="uk-form-label" for="form-horizontal-text">Nome Superior</label>-->
+              <div class="uk-form-controls">
+                  <input class="uk-input" type="text" placeholder="Nome Superior" id="topLineText">
+              </div>
+              <div class="uk-form-controls">
+                  <input class="uk-input" type="text" placeholder="Nome Inferior" id="bottomLineText">
+              </div>
+          </div>
+          <p>By <a href="http://renanlopes.com">Renan Lopes</a></p>
+          <button id="saveBtn" class="uk-button uk-button-default">Gerar Meme</button><br>
+          <canvas class="uk-margin" width="500" height="500"></canvas>
+        
+      </div>
+    </div>
+  </div>
+</div>
+  <script>
+    function textChangeListener (evt) {
+      var id = evt.target.id;
+      var text = evt.target.value;
+      
+      if (id == "topLineText") {
+        window.topLineText = text;
+      } else {
+        window.bottomLineText = text;
+      }
+      
+      redrawMeme(window.imageSrc, window.topLineText, window.bottomLineText);
+    }
+    
+    function redrawMeme(image, topLine, bottomLine) {
+      // Get Canvas2DContext
+      var canvas = document.querySelector('canvas');
+      var ctx = canvas.getContext("2d");
+      if(image != null)
+       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle= "rgba(0,0,0,.85)";
+      ctx.fillStyle= "#fff";
+      ctx.lineWidth = 2;
+      ctx.textAlign = "center";
+      ctx.font = "bold 30pt Audiowide";
+
+      if(topLine != null){
+        ctx.fillText(topLine, canvas.width / 2 , 40);
+        ctx.strokeText(topLine, canvas.width / 2 , 40);
+      }
+
+      if(bottomLine != null){
+        ctx.fillText(bottomLine, canvas.width / 2 , canvas.height - 20);
+        ctx.strokeText(bottomLine, canvas.width / 2 , canvas.height - 20);
+      }
+      ctx.fill();
+    }
+    
+    function saveFile() {
+      window.open(document.querySelector('canvas').toDataURL());
+    }
+    
+    function handleFileSelect(evt) {
+      var canvasWidth = 500;
+      var canvasHeight = 500;
+      var file = evt.target.files[0];
+      
+      
+      
+      var reader = new FileReader();
+      reader.onload = function(fileObject) {
+        var data = fileObject.target.result;
+        
+        // Create an image object
+        var image = new Image();
+        image.onload = function() {
+          
+          window.imageSrc = this;
+          redrawMeme(window.imageSrc, null, null);
+        }
+        
+        // Set image data to background image.
+        image.src = data;
+        console.log(fileObject.target.result);
+      };
+      reader.readAsDataURL(file)
+    }
+    
+    window.topLineText = "";
+    window.bottomLineText = "";
+    var input1 = document.getElementById('topLineText');
+    var input2 = document.getElementById('bottomLineText');
+    input1.oninput = textChangeListener;
+    input2.oninput = textChangeListener;
+    document.getElementById('file').addEventListener('change', handleFileSelect, false);
+    document.querySelector('#saveBtn').addEventListener('click', saveFile, false);
+  </script>
+
+</body>
+</html>
